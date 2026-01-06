@@ -88,5 +88,6 @@ def ft_inventory_system() -> None:
           f'Rarity: {laser_sword.get_rarity().value}, '
           f'Category: {laser_sword.get_category()}')
 
+
 if __name__ == '__main__':
     ft_inventory_system()
