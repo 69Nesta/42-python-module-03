@@ -15,9 +15,11 @@ def ft_score_analytics():
         return print('No scores provided. Usage:'
                      f'python3 {args[0]} <score1> <score2> ...')
     for score in args[1:]:
-        if (not score.isdigit()):
+        try:
+            parsed_score = int(score)
+            scores.append(parsed_score)
+        except Exception:
             return print(f'Error you have typed \'{score}\': its not a score!')
-        scores.append(int(score))
     if (len(scores) < 1):
         return print('Not enough scores provied!')
     print(f'Scores processed: {scores}')
