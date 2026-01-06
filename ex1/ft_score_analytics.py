@@ -4,6 +4,9 @@ import sys
 
 
 def ft_score_analytics():
+    '''
+    Analyzes player scores provided as command-line arguments.
+    '''
     args = sys.argv
     args_len = len(sys.argv)
     scores: list[int] = []
