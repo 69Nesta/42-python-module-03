@@ -80,23 +80,43 @@ t_transactions = list[tuple[str, str, int]]
 
 
 def get_item(item_key: str) -> dict[str, int | str]:
+    '''
+    Retrieve item details by item key
+    '''
+
     return ITEMS[item_key]
 
 
 class Inventory:
+    '''
+    Class representing a player's inventory
+    '''
+
     def __init__(self, name: str, raw: t_inventory):
+        '''
+        Initialize the inventory with player name and raw inventory data
+        '''
+
         self.name = name.capitalize()
         self.items: dict[str, int] = raw['items']
         self.total_value = raw['total_value']
         self.item_count = raw['item_count']
 
     def get_item_values(self, item_key: str) -> dict[str, int | str]:
+        '''
+        Retrieve detailed information about an item in the inventory
+        '''
+
         item = get_item(item_key).copy()
         item.update({'count': self.items.get(item_key)})
         return item
 
     def remove_item(self, item_key: str,
                     transactions: t_transactions, quantity=1) -> None:
+        '''
+        Remove an item from the inventory
+        '''
+
         item = self.items.get(item_key)
         if (quantity < 0):
             raise ValueError('Quantity cannot be negative')
@@ -109,6 +129,10 @@ class Inventory:
 
     def add_item(self, item_key: str,
                  transactions: t_transactions, quantity=1) -> None:
+        '''
+        Add an item to the inventory
+        '''
+
         item = self.items.get(item_key)
         if (quantity < 0):
             raise ValueError('Quantity cannot be negative')
@@ -121,6 +145,10 @@ class Inventory:
         self.update()
 
     def update(self) -> None:
+        '''
+        Update total value and item count of the inventory
+        '''
+
         new_total_value = 0
         new_item_count = 0
         for item, count in self.items.items():
@@ -130,6 +158,10 @@ class Inventory:
         self.item_count = new_item_count
 
     def display_inventory(self) -> None:
+        '''
+        Display the inventory details
+        '''
+
         print(f'=== {self.name}\'s Inventory ===')
         for item_key, count in self.items.items():
             stats = self.get_item_values(item_key)
@@ -157,6 +189,10 @@ class Inventory:
 
 def give(inv_from: Inventory, inv_to: Inventory, item_key: str,
          transactions: t_transactions, quantity=1):
+    '''
+    Transfer items from one inventory to another
+    '''
+
     item = get_item(item_key)
     if (quantity <= 0):
         raise ValueError('Quantity cannot be negative')
@@ -171,12 +207,20 @@ def give(inv_from: Inventory, inv_to: Inventory, item_key: str,
 
 
 def print_transactions(transactions: t_transactions) -> None:
+    '''
+    Print the list of transactions
+    '''
+
     print('=== Updated Inventories ===')
     for transaction in transactions:
         print(f'{transaction[0]} {transaction[1]}: {transaction[2]}')
 
 
 def inventories_report(players: dict[str, Inventory]):
+    '''
+    Generate and print inventory analytics report
+    '''
+
     print('=== Inventory Analytics ===')
     richest = max(players.items(), key=lambda x: x[1].total_value)
     print(f'Most valuable player: {richest[1].name} '
@@ -193,6 +237,10 @@ def inventories_report(players: dict[str, Inventory]):
 
 
 def ft_inventory_system() -> None:
+    '''
+    Main function to run the inventory system
+    '''
+
     players: dict[str, Inventory] = {}
     transactions: t_transactions = []
     for name, inventory in RAW_PLAYERS.items():
