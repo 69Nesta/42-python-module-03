@@ -24,6 +24,9 @@ class Player:
 
 
 def demonstrate_list(players: list[Player]) -> None:
+    '''
+    List comprehension examples.
+    '''
     print('=== List Comprehension Examples ===')
 
     high_scores = [player.name for player in players if player.score > 2000]
@@ -35,6 +38,9 @@ def demonstrate_list(players: list[Player]) -> None:
 
 
 def demonstrate_dict(l_players: list[Player]) -> None:
+    '''
+    Dictionary comprehension examples.
+    '''
     print('\n=== Dictionary Comprehension Examples ===')
     players = {player.name: player for player in l_players}
     players_scores = {name: player.score for name, player in players.items()}
@@ -54,6 +60,9 @@ def demonstrate_dict(l_players: list[Player]) -> None:
 
 
 def demonstrate_set(players: list[Player]) -> None:
+    '''
+    Set comprehension examples.
+    '''
     print('\n=== Set Comprehension Examples ===')
 
     unique_players = {player.name for player in players}
@@ -69,6 +78,9 @@ def demonstrate_set(players: list[Player]) -> None:
 
 
 def demonstrate_combined(players: list[Player]):
+    '''
+    Combined analysis using various comprehensions.
+    '''
     print('\n=== Combined Analysis ===')
 
     total_players = len(players)
@@ -87,6 +99,10 @@ def demonstrate_combined(players: list[Player]):
 
 
 def ft_analytics_dashboard() -> None:
+    '''
+    Main function to demonstrate various comprehension techniques
+    in a game analytics dashboard context.
+    '''
     print('=== Game Analytics Dashboard ===\n')
     players: list[Player] = [
         Player(
