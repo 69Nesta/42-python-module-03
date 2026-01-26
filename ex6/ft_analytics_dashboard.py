@@ -10,10 +10,10 @@ class Player:
         self,
         name: str,
         score: int,
-        active: bool = False,
-        achievements: list[str] = None,
-        scores_categories: dict[str, int] = None,
-        region: str = None,
+        active: bool,
+        achievements: list[str],
+        scores_categories: dict[str, int],
+        region: str,
     ) -> None:
         self.name = name
         self.score = score
@@ -77,7 +77,7 @@ def demonstrate_set(players: list[Player]) -> None:
     print(f'Active regions: {active_regions}')
 
 
-def demonstrate_combined(players: list[Player]):
+def demonstrate_combined(players: list[Player]) -> None:
     '''
     Combined analysis using various comprehensions.
     '''
@@ -95,7 +95,8 @@ def demonstrate_combined(players: list[Player]):
     print(f'Average Score: {average_score:.2f}')
 
     best_player = max(players, key=lambda player: player.score)
-    print(f'Best Player: {best_player.name} with score {best_player.score}')
+    print(f'Best Player: {best_player.name} with score {best_player.score}'
+          f' and {len(best_player.achievements)} achievements')
 
 
 def ft_analytics_dashboard() -> None:
@@ -109,25 +110,25 @@ def ft_analytics_dashboard() -> None:
             'Alice',
             2300,
             True,
-            achievements=['First Win', 'Sharp Shooter', 'First Win'],
-            scores_categories={'high': 1, 'medium': 1, 'low': 1},
-            region='nord',
+            ['First Win', 'Sharp Shooter', 'First Win'],
+            {'high': 1, 'medium': 1, 'low': 1},
+            'nord',
         ),
         Player(
             'Bob',
             1800,
             True,
-            achievements=['First Win'],
-            scores_categories={'high': 0, 'medium': 2, 'low': 0},
-            region='central',
+            ['First Win', 'The Goat'],
+            {'high': 0, 'medium': 2, 'low': 0},
+            'central',
         ),
         Player(
             'Charlie',
             2150,
             True,
-            achievements=[],
-            scores_categories={'high': 0, 'medium': 1, 'low': 1},
-            region='central',
+            [],
+            {'high': 0, 'medium': 1, 'low': 1},
+            'central',
         ),
     ]
     demonstrate_list(players)
