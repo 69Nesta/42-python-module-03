@@ -1,5 +1,7 @@
 #! python3
 
+from typing import cast
+
 RAW_PLAYERS = {
     'alice': {
         'items': {
@@ -84,7 +86,7 @@ def get_item(item_key: str) -> dict[str, int | str]:
     Retrieve item details by item key
     '''
 
-    return ITEMS[item_key]
+    return cast(dict[str, int | str], ITEMS[item_key])
 
 
 class Inventory:
@@ -98,7 +100,7 @@ class Inventory:
         '''
 
         self.name = name.capitalize()
-        self.items: dict[str, int] = raw['items']
+        self.items: dict[str, int] = cast(dict[str, int], raw['items'])
         self.total_value = raw['total_value']
         self.item_count = raw['item_count']
 
@@ -108,7 +110,7 @@ class Inventory:
         '''
 
         item = get_item(item_key).copy()
-        item.update({'count': self.items.get(item_key)})
+        item.update({'count': self.items.get(item_key, 0)})
         return item
 
     def remove_item(self, item_key: str,
@@ -149,11 +151,13 @@ class Inventory:
         Update total value and item count of the inventory
         '''
 
-        new_total_value = 0
-        new_item_count = 0
+        new_total_value: int = 0
+        new_item_count: int = 0
         for item, count in self.items.items():
             new_item_count += count
-            new_total_value += self.get_item_values(item).get('value') * count
+            new_total_value = cast(int, self.get_item_values(item).get(
+                'value', 0
+            )) * count
         self.total_value = new_total_value
         self.item_count = new_item_count
 
@@ -166,21 +170,24 @@ class Inventory:
         for item_key, count in self.items.items():
             stats = self.get_item_values(item_key)
             price = stats.get('value')
+            if (not price or price is not int):
+                continue
             if (count > 0):
-                print(f'{stats.get('name')} ({stats.get('type')}, '
-                      f'{stats.get('rarity')}): '
+                print(f"{stats.get('name')} ({stats.get('type')}, "
+                      f"{stats.get('rarity')}): "
                       f'{count}x @ {price} gold each = {count * price} gold')
         print('')
         print(f'Inventory value: {self.total_value} gold')
         print(f'Item count: {self.item_count} items')
 
         items_list = list(map(self.get_item_values, self.items.keys()))
-        categories = {}
+        categories: dict[str, int] = {}
         for item in items_list:
-            if (categories.get(item.get('type'))):
-                categories[item.get('type')] += item.get('count')
+            type_id: str = cast(str, item.get('type'))
+            if (categories.get(type_id)):
+                categories[type_id] += cast(int, item.get('count', 0))
             else:
-                categories[item.get('type')] = item.get('count')
+                categories[type_id] = cast(int, item.get('count', 0))
         categories_str = ''
         for name, count in categories.items():
             categories_str += f'{name}({count}) '
@@ -197,7 +204,7 @@ def give(inv_from: Inventory, inv_to: Inventory, item_key: str,
     if (quantity <= 0):
         raise ValueError('Quantity cannot be negative')
     print(f'=== Transaction: {inv_from.name} gives {inv_to.name} '
-          f'{quantity} {item.get('name')} ===')
+          f"{quantity} {item.get('name')} ===")
     try:
         inv_from.remove_item(item_key, transactions, quantity)
         print('Transaction successful!')
@@ -216,16 +223,24 @@ def print_transactions(transactions: t_transactions) -> None:
         print(f'{transaction[0]} {transaction[1]}: {transaction[2]}')
 
 
+def player_get_value(player: Inventory) -> int:
+    return cast(int, player.total_value)
+
+
+def player_item_count(player: Inventory) -> int:
+    return cast(int, player.item_count)
+
+
 def inventories_report(players: dict[str, Inventory]):
     '''
     Generate and print inventory analytics report
     '''
 
     print('=== Inventory Analytics ===')
-    richest = max(players.items(), key=lambda x: x[1].total_value)
+    richest = max(players.items(), key=lambda x: player_get_value(x[1]))
     print(f'Most valuable player: {richest[1].name} '
           f'({richest[1].total_value} gold)')
-    most_items = max(players.items(), key=lambda x: x[1].item_count)
+    most_items = max(players.items(), key=lambda x: player_item_count(x[1]))
     print(f'Most items: {most_items[1].name} '
           f'({most_items[1].item_count} items)')
     legendary_item_names = [
@@ -233,7 +248,7 @@ def inventories_report(players: dict[str, Inventory]):
             item['rarity'] == 'legendary'
         )
     ]
-    print(f'Rarest items: {str(legendary_item_names).strip('[]')}')
+    print(f"Rarest items: {str(legendary_item_names).strip('[]')}")
 
 
 def ft_inventory_system() -> None:
@@ -244,7 +259,7 @@ def ft_inventory_system() -> None:
     players: dict[str, Inventory] = {}
     transactions: t_transactions = []
     for name, inventory in RAW_PLAYERS.items():
-        players[name] = Inventory(name, inventory)
+        players[name] = Inventory(name, cast(t_inventory, inventory))
 
     print('=== Player Inventory System ===')
     print('')
