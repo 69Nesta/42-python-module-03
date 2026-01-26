@@ -52,19 +52,25 @@ def parse_coordinates(arg: str, player_coords: t_coords) -> list[tuple]:
         try:
             parsed_coords = parse_coordinate(coord)
             distance = calculate_distance(player_coords, parsed_coords)
-            print(f'Parsing coordinates: "{coord.strip('()')}"')
+            print(f'Parsing coordinates: "{coord.strip("()")}"')
             print(f'Parsed position: {parsed_coords}')
             print(f'Distance between {player_coords} and {parsed_coords}: '
-                  f'{round(distance, 2)}')
+                  f'{distance:.2f}')
             coords.append(parsed_coords)
             player_coords = parsed_coords
         except ValueError as e:
-            print(f'Parsing invalid coordinates: "{coord.strip('()')}"')
+            print(f'Parsing invalid coordinates: "{coord.strip("()")}"')
             print(f'Error parsing coordinates: {e}')
             print(f'Error details - Type: {type(e).__name__}, Args {e.args}')
         finally:
             print('')
     return (coords)
+
+
+def print_distance(point_a: t_coords, point_b: t_coords) -> None:
+    distance = calculate_distance(point_a, point_b)
+    print(f'Distance between {point_a} and {point_b}: '
+          f'{distance:.2f}')
 
 
 def ft_coordinate_system() -> None:
@@ -83,9 +89,12 @@ def ft_coordinate_system() -> None:
                      f'python3 {argv[0]} xx,xx,xx or [(xx,xx,xx), ...]')
     print('=== Game Coordinate System ===\n')
     spawn_coords = (0, 0, 0)
-    player_coords = spawn_coords
+    player_coords = (10, 20, 5)
+    print(f'Positon created at : {player_coords}')
+    print_distance(spawn_coords, player_coords)
+    print()
     try:
-        coords = parse_coordinates(argv[1], player_coords)
+        coords = parse_coordinates(argv[1], spawn_coords)
         if (len(coords) > 0):
             player_coords = coords.pop()
     except ValueError as e:
