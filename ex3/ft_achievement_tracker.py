@@ -106,26 +106,22 @@ def ft_achievement_tracker() -> None:
     print('\n=== Achievement Analytics ===\n')
 
     if (len(players) == 0):
-        return ValueError('Not enough players!')
+        return print('Not enough players!')
 
-    others_achievements = (player.get_achievements() for player in players[1:])
+    all_achievements: list[set[str]] = [
+        player.get_achievements() for player in players
+    ]
 
-    all_achievements = players[0].get_achievements().union(
-        *(others_achievements)
-    )
-    print(f'All unique achievements: {all_achievements}')
-    print(f'Total unique achievements: {len(all_achievements)}\n')
+    all_unique_achievements: set[str] = set.union(*all_achievements)
+    print(f'All unique achievements: {all_unique_achievements}')
+    print(f'Total unique achievements: {len(all_unique_achievements)}\n')
 
-    common_to_all_player = players[0].get_achievements().intersection(
-        *(others_achievements)
-    )
-    print(f'Common to all players: {common_to_all_player}')
-    rare_achievements = players[0].get_achievements().difference(
-        *(others_achievements)
-    )
-    print(f'Rare achievements (1 player): {rare_achievements}')
+    common_to_all_player: set[str] = set.intersection(*all_achievements)
+    print(f'Common to all players: {common_to_all_player}\n')
 
-    print('')
+    rare_achievements: set[str] = set.difference(*all_achievements)
+    print(f'Rare achievements (1 player): {rare_achievements}\n')
+
     player1 = players[0]
     player2 = players[1]
     print(f'{player1.get_name()} vs {player2.get_name()} common: '
