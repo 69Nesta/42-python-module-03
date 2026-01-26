@@ -8,7 +8,7 @@ t_event = tuple[int, str, int, str]
 t_stats = dict[str, int]
 
 
-def generate_event(numbers) -> Generator[tuple[int, str, int, str]]:
+def generate_event(numbers) -> Generator[tuple[int, str, int, str], None, None]:
     '''
     Generate a stream of game events
     '''
@@ -57,7 +57,7 @@ def process_event(event: t_event, stats: t_stats) -> None:
     })
 
 
-def fibonacci(n: int) -> Generator[int]:
+def fibonacci(n: int) -> Generator[int, None, None]:
     '''
     Generate first n Fibonacci numbers
     '''
@@ -69,7 +69,7 @@ def fibonacci(n: int) -> Generator[int]:
         a, b = b, b + a
 
 
-def primes(n: int) -> Generator[int]:
+def primes(n: int) -> Generator[int, None, None]:
     '''
     Generate first n prime numbers
     '''
