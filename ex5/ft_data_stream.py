@@ -1,13 +1,14 @@
 #! python3
 
 from datetime import datetime
+from typing import Generator
 
 
 t_event = tuple[int, str, int, str]
 t_stats = dict[str, int]
 
 
-def generate_event(numbers):
+def generate_event(numbers) -> Generator[tuple[int, str, int, str]]:
     '''
     Generate a stream of game events
     '''
@@ -28,7 +29,7 @@ def generate_event(numbers):
         )
 
 
-def process_event(event: t_event, stats: t_stats):
+def process_event(event: t_event, stats: t_stats) -> None:
     '''
     Process a single game event and update statistics
     '''
@@ -56,7 +57,7 @@ def process_event(event: t_event, stats: t_stats):
     })
 
 
-def fibonacci(n: int) -> iter:
+def fibonacci(n: int) -> Generator[int]:
     '''
     Generate first n Fibonacci numbers
     '''
@@ -68,7 +69,7 @@ def fibonacci(n: int) -> iter:
         a, b = b, b + a
 
 
-def primes(n: int) -> iter:
+def primes(n: int) -> Generator[int]:
     '''
     Generate first n prime numbers
     '''
@@ -89,7 +90,7 @@ def primes(n: int) -> iter:
                 nbr += 1
 
 
-def ft_data_stream():
+def ft_data_stream() -> None:
     '''
     Main function to process game data stream and demonstrate generators
     '''
