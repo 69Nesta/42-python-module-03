@@ -3,33 +3,39 @@
 import sys
 
 
-def ft_score_analytics():
+def ft_score_analytics() -> None:
     '''
     Analyzes player scores provided as command-line arguments.
     '''
-    args = sys.argv
-    args_len = len(sys.argv)
+    args: list[str] = sys.argv
+    args_len: int = len(sys.argv)
     scores: list[int] = []
     print('=== Player Score Analytics ===')
     if (args_len <= 1):
-        return print('No scores provided. Usage:'
-                     f'python3 {args[0]} <score1> <score2> ...')
-    for score in args[1:]:
+        print('No scores provided. Usage: '
+              f'python3 {args[0]} <score1> <score2> ...')
+        return
+    for arg in args[1:]:
         try:
-            parsed_score = int(score)
+            parsed_score: int = int(arg)
             scores.append(parsed_score)
         except Exception:
-            return print(f'Error you have typed \'{score}\': its not a score!')
-    if (len(scores) < 1):
-        return print('Not enough scores provied!')
+            print(f"Error you have typed '{arg}': its not a score!")
+            return
+    if len(scores) < 1:
+        print('Not enough scores provided!')
+        return
     print(f'Scores processed: {scores}')
-    scores_len = len(scores)
+    scores_len: int = len(scores)
     print(f'Total players: {scores_len}')
     print(f'Total scores: {sum(scores)}')
-    average_score = 0.0
+
+    average_score: float = 0.0
+
     for score in scores:
         average_score += score / scores_len
-    print(f'Average score: : {average_score}')
+
+    print(f'Average score: : {average_score:.1f}')
     print(f'High score: {max(scores)}')
     print(f'Low score: {min(scores)}')
     print(f'Score Range: {max(scores) - min(scores)}')

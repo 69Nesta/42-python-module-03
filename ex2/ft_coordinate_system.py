@@ -21,7 +21,7 @@ def calculate_distance(point_a: t_coords, point_b: t_coords) -> float:
 
 def parse_coordinate(coord: str) -> tuple:
     '''
-    Parse a coordinate string into a tuple of integers.
+    Parse a coordinate string into  a tuple of integers.
     :param coord: Coordinate string in the format "(x,y,z)".
     :returns: A tuple of three integers representing the coordinate.
     :raises ValueError: If the coordinate format is invalid.
