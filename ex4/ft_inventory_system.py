@@ -70,6 +70,7 @@ class Inventory:
 
 
 def main() -> None:
+    print('=== Inventory System Analysis ===')
     args: list[str] = sys.argv
     inv: Inventory
     try:
@@ -81,7 +82,6 @@ def main() -> None:
               'sword:1 potion:5 shield:2 armor:3 helmet:1')
         return
 
-    print('=== Inventory System Analysis ===')
     inv.show_system_analytics()
 
     print('\n=== Current Inventory ===')
