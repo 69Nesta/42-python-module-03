@@ -1,276 +1,104 @@
-#! python3
-
-from typing import cast
-
-RAW_PLAYERS = {
-    'alice': {
-        'items': {
-            'pixel_sword': 1,
-            'code_bow': 1,
-            'health_byte': 5,
-            'quantum_ring': 3
-        },
-        'total_value': 1975,
-        'item_count': 10
-    },
-    'bob': {
-        'items': {
-            'code_bow': 3,
-            'pixel_sword': 2
-        },
-        'total_value': 900,
-        'item_count': 5
-    },
-    'charlie': {
-        'items': {
-            'pixel_sword': 1,
-            'code_bow': 1
-        },
-        'total_value': 350,
-        'item_count': 2
-    },
-    'diana': {
-        'items': {
-            'code_bow': 3,
-            'pixel_sword': 3,
-            'health_byte': 3,
-            'data_crystal': 3
-        },
-        'total_value': 4125,
-        'item_count': 12
-    }
-}
-
-ITEMS = {
-    'pixel_sword': {
-        'name': 'Pixel Sword',
-        'type': 'weapon',
-        'value': 150,
-        'rarity': 'common'
-    },
-    'quantum_ring': {
-        'name': 'Quantum Ring',
-        'type': 'accessory',
-        'value': 500,
-        'rarity': 'rare'
-    },
-    'health_byte': {
-        'name': 'Health Byte',
-        'type': 'consumable',
-        'value': 25,
-        'rarity': 'common'
-    },
-    'data_crystal': {
-        'name': 'Data Crystal',
-        'type': 'material',
-        'value': 1000,
-        'rarity': 'legendary'
-    },
-    'code_bow': {
-        'name': 'Code Bow',
-        'type': 'weapon',
-        'value': 200,
-        'rarity': 'uncommon'
-    }
-}
-
-
-t_inventory = dict[str, int | dict[str, int]]
-
-
-t_transactions = list[tuple[str, str, int]]
-
-
-def get_item(item_key: str) -> dict[str, int | str]:
-    '''
-    Retrieve item details by item key
-    '''
-
-    return cast(dict[str, int | str], ITEMS[item_key])
+import sys
 
 
 class Inventory:
-    '''
-    Class representing a player's inventory
-    '''
+    SCARCE_IDS: list[str] = ['sword', 'shield', 'armor', 'helmet']
 
-    def __init__(self, name: str, raw: t_inventory):
-        '''
-        Initialize the inventory with player name and raw inventory data
-        '''
+    def __init__(self, raw: list[str]) -> None:
+        self.stock: dict[str, int] = {}
+        self.total: int = 0
 
-        self.name = name.capitalize()
-        self.items: dict[str, int] = cast(dict[str, int], raw['items'])
-        self.total_value = raw['total_value']
-        self.item_count = raw['item_count']
+        for raw_item in raw:
+            raw_splited = raw_item.strip().split(':')
+            [name_raw, count_raw] = raw_splited
+            name = name_raw.strip().lower()
+            count = int(count_raw)
+            self.total += count
+            self.stock[name] = self.stock.get(name, 0) + count
 
-    def get_item_values(self, item_key: str) -> dict[str, int | str]:
-        '''
-        Retrieve detailed information about an item in the inventory
-        '''
+    def show_system_analytics(self) -> None:
+        print(f'Total items in inventory: {self.total}')
+        items = set(self.stock.keys())
+        print(f'Unique item types: {len(items)}')
 
-        item = get_item(item_key).copy()
-        item.update({'count': self.items.get(item_key, 0)})
-        return item
+    @staticmethod
+    def get_unit(count: int) -> str:
+        return f'{count} unit{"s" if count > 1 else ""}'
 
-    def remove_item(self, item_key: str,
-                    transactions: t_transactions, quantity=1) -> None:
-        '''
-        Remove an item from the inventory
-        '''
+    def show_inventory(self) -> None:
+        for name, count in sorted(
+                    self.stock.items(),
+                    reverse=True,
+                    key=lambda x: x[1]
+                ):
+            print(f'{name}: {self.get_unit(count)}' +
+                  f' ({count / self.total * 100:.1f}%)')
 
-        item = self.items.get(item_key)
-        if (quantity < 0):
-            raise ValueError('Quantity cannot be negative')
-        if (item and item >= quantity):
-            self.items.update({item_key: item - quantity})
-            transactions.append((self.name, item_key, item - quantity))
-            self.update()
-        else:
-            raise ValueError('Not enough items')
+    def show_inv_stats(self) -> None:
+        most = max(self.stock.items(), key=lambda x: x[1])
+        least = min(self.stock.items(), key=lambda x: x[1])
+        print(f'Most abundant: {most[0]} ({self.get_unit(most[1])})')
+        print(f'Least abundant: {least[0]} ({self.get_unit(least[1])})')
 
-    def add_item(self, item_key: str,
-                 transactions: t_transactions, quantity=1) -> None:
-        '''
-        Add an item to the inventory
-        '''
+    def show_item_categories(self) -> None:
+        moderate = {
+            name: count
+            for name, count in self.stock.items()
+            if name not in self.SCARCE_IDS
+        }
+        scarce = {
+            name: count
+            for name, count in self.stock.items()
+            if name in self.SCARCE_IDS
+        }
+        print(f'Moderate: {moderate}')
+        print(f'Scarce: {scarce}')
 
-        item = self.items.get(item_key)
-        if (quantity < 0):
-            raise ValueError('Quantity cannot be negative')
-        if (item):
-            self.items.update({item_key: item + quantity})
-            transactions.append((self.name, item_key, item + quantity))
-        else:
-            self.items.update({item_key: quantity})
-            transactions.append((self.name, item_key, quantity))
-        self.update()
+    def show_restock(self) -> None:
+        need_restock = [
+            name
+            for name, count in self.stock.items()
+            if count <= 1
+        ]
+        print(f'Restock needed: {need_restock}')
 
-    def update(self) -> None:
-        '''
-        Update total value and item count of the inventory
-        '''
-
-        new_total_value: int = 0
-        new_item_count: int = 0
-        for item, count in self.items.items():
-            new_item_count += count
-            new_total_value = cast(int, self.get_item_values(item).get(
-                'value', 0
-            )) * count
-        self.total_value = new_total_value
-        self.item_count = new_item_count
-
-    def display_inventory(self) -> None:
-        '''
-        Display the inventory details
-        '''
-
-        print(f'=== {self.name}\'s Inventory ===')
-        for item_key, count in self.items.items():
-            stats = self.get_item_values(item_key)
-            price = stats.get('value')
-            if (not price or price is not int):
-                continue
-            if (count > 0):
-                print(f"{stats.get('name')} ({stats.get('type')}, "
-                      f"{stats.get('rarity')}): "
-                      f'{count}x @ {price} gold each = {count * price} gold')
-        print('')
-        print(f'Inventory value: {self.total_value} gold')
-        print(f'Item count: {self.item_count} items')
-
-        items_list = list(map(self.get_item_values, self.items.keys()))
-        categories: dict[str, int] = {}
-        for item in items_list:
-            type_id: str = cast(str, item.get('type'))
-            if (categories.get(type_id)):
-                categories[type_id] += cast(int, item.get('count', 0))
-            else:
-                categories[type_id] = cast(int, item.get('count', 0))
-        categories_str = ''
-        for name, count in categories.items():
-            categories_str += f'{name}({count}) '
-        print(f'Categories: {categories_str}')
+    def show_dict_props(self) -> None:
+        print(f'Dictionary keys: {self.stock.keys()}')
+        print(f'Dictionary values: {self.stock.values()}')
+        print('Sample lookup - \'sword\' in inventory: ' +
+              f'{("sword" in self.stock.keys())}')
 
 
-def give(inv_from: Inventory, inv_to: Inventory, item_key: str,
-         transactions: t_transactions, quantity=1):
-    '''
-    Transfer items from one inventory to another
-    '''
-
-    item = get_item(item_key)
-    if (quantity <= 0):
-        raise ValueError('Quantity cannot be negative')
-    print(f'=== Transaction: {inv_from.name} gives {inv_to.name} '
-          f"{quantity} {item.get('name')} ===")
+def main() -> None:
+    args: list[str] = sys.argv
+    inv: Inventory
     try:
-        inv_from.remove_item(item_key, transactions, quantity)
-        print('Transaction successful!')
-        inv_to.add_item(item_key, transactions, quantity)
-    except ValueError as e:
-        print(e)
+        if len(args) <= 1:
+            raise ValueError()
+        inv = Inventory(args[1:])
+    except ValueError:
+        print(f'Usage: python3 {args[0]} '
+              'sword:1 potion:5 shield:2 armor:3 helmet:1')
+        return
 
+    print('=== Inventory System Analysis ===')
+    inv.show_system_analytics()
 
-def print_transactions(transactions: t_transactions) -> None:
-    '''
-    Print the list of transactions
-    '''
+    print('\n=== Current Inventory ===')
+    inv.show_inventory()
 
-    print('=== Updated Inventories ===')
-    for transaction in transactions:
-        print(f'{transaction[0]} {transaction[1]}: {transaction[2]}')
+    print('\n=== Inventory Statistics ===')
+    inv.show_inv_stats()
 
+    print('\n=== Item Categories ===')
+    inv.show_item_categories()
 
-def player_get_value(player: Inventory) -> int:
-    return cast(int, player.total_value)
+    print('\n=== Management Suggestions ===')
+    inv.show_restock()
 
-
-def player_item_count(player: Inventory) -> int:
-    return cast(int, player.item_count)
-
-
-def inventories_report(players: dict[str, Inventory]):
-    '''
-    Generate and print inventory analytics report
-    '''
-
-    print('=== Inventory Analytics ===')
-    richest = max(players.items(), key=lambda x: player_get_value(x[1]))
-    print(f'Most valuable player: {richest[1].name} '
-          f'({richest[1].total_value} gold)')
-    most_items = max(players.items(), key=lambda x: player_item_count(x[1]))
-    print(f'Most items: {most_items[1].name} '
-          f'({most_items[1].item_count} items)')
-    legendary_item_names = [
-        item.get('name') for item in ITEMS.values() if (
-            item['rarity'] == 'legendary'
-        )
-    ]
-    print(f"Rarest items: {str(legendary_item_names).strip('[]')}")
-
-
-def ft_inventory_system() -> None:
-    '''
-    Main function to run the inventory system
-    '''
-
-    players: dict[str, Inventory] = {}
-    transactions: t_transactions = []
-    for name, inventory in RAW_PLAYERS.items():
-        players[name] = Inventory(name, cast(t_inventory, inventory))
-
-    print('=== Player Inventory System ===')
-    print('')
-    players['alice'].display_inventory()
-    print('')
-    give(players['alice'], players['bob'], 'pixel_sword', transactions, 1)
-    print('')
-    print_transactions(transactions)
-    print('')
-    inventories_report(players)
+    print('\n=== Dictionary Properties Demo ===')
+    inv.show_dict_props()
 
 
 if __name__ == '__main__':
-    ft_inventory_system()
+    main()
