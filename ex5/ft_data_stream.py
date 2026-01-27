@@ -8,7 +8,9 @@ t_event = tuple[int, str, int, str]
 t_stats = dict[str, int]
 
 
-def generate_event(numbers) -> Generator[tuple[int, str, int, str], None, None]:
+def generate_event(
+            numbers: int
+        ) -> Generator[tuple[int, str, int, str], None, None]:
     '''
     Generate a stream of game events
     '''
