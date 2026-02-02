@@ -62,11 +62,11 @@ class Inventory:
         ]
         print(f'Restock needed: {need_restock}')
 
-    def show_dict_props(self) -> None:
+    def show_dict_props(self, lookup: str) -> None:
         print(f'Dictionary keys: {[key for key in self.stock.keys()]}')
         print(f'Dictionary values: {[val for val in self.stock.values()]}')
-        print('Sample lookup - \'sword\' in inventory: ' +
-              f'{("sword" in self.stock.keys())}')
+        print(f'Sample lookup - \'{lookup}\' in inventory: ' +
+              f'{(lookup in self.stock.keys())}')
 
 
 def main() -> None:
@@ -97,7 +97,7 @@ def main() -> None:
     inv.show_restock()
 
     print('\n=== Dictionary Properties Demo ===')
-    inv.show_dict_props()
+    inv.show_dict_props('sword')
 
 
 if __name__ == '__main__':
