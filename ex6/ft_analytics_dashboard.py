@@ -73,7 +73,11 @@ def demonstrate_set(players: list[Player]) -> None:
     )
     print(f'Unique achievements: {unique_achievements}')
 
-    active_regions = {player.region for player in players if player.region}
+    active_regions = {
+        player.region
+        for player in players
+        if player.region and player.active
+    }
     print(f'Active regions: {active_regions}')
 
 
